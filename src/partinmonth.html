@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="preconnect" href="https://unpkg.com/" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css" />
+    <link rel="stylesheet" href="./css/master.css" />
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+    <!-- --- เปลี่ยนชื่อหน้าใน Tag นี้ --- -->
+    <title>CPE231 - CMMS - Total Part</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- --- เริ่มแก้ไขตั้งแต่ตรงนี้ --- -->
+        <div class="box">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="container">
+                    <div class="navbar-item">
+                        <img src="../assets/logo.png" style="max-height:50px">
+                    </div>
+                    <div id="navbarBasicExample" class="navbar-menu">
+                        <div class="navbar-start">
+                            <b-navbar-item href="/">Index Page</b-navbar-item>
+                            <b-navbar-dropdown label="simple form">
+                                <b-navbar-item href="/addpart.html">
+                                    จัดการคลังอะไหล่
+                                </b-navbar-item>
+                            </b-navbar-dropdown>
+                            <b-navbar-dropdown label="complex form">
+                                <b-navbar-item href="/importpts.html">
+                                    ขอเบิกอะไหล่
+                                </b-navbar-item>
+                            </b-navbar-dropdown>
+                            <b-navbar-dropdown label="analyst report">
+                                <b-navbar-item href="/partinmonth.html">
+                                    สรุปการเบิกอะไหล่ในเดือนนี้
+                                </b-navbar-item>
+                            </b-navbar-dropdown>
+                        </div>
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <h1 class="header-text">Computerized Maintenance Management System</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <!--  เนื้อหาweb    -->
+        <div class="container">
+            <div class="spacer is-2x"></div>
+            <h1 class="title">
+                <i class="fas fa-cogs"></i> สรุปรายการอะไหล่
+            </h1>
+            <hr />
+            <div class="box">
+                <div style="flex-basis:0;flex-grow:1;flex-shrink:1">
+                    <div class="title is-6">
+                        <i class="fas fa-list"></i> รายการอะไหล่ที่เบิกไปทั้งหมดในเดือนนี้
+                    </div>
+                    <table class="table is-narrow is-striped is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th>รหัสประจำอะไหล่</th>
+                                <th>ชื่ออะไหล่</th>
+                                <th>จำนวน</th>
+                                <th>อื่นๆ</th>
+                            </tr>
+                        </thead>
+
+                        <tbody v-for="(item_inlist,j) in part_inmonth" :key="j" :value="j">
+                            <tr>
+                                <td>{{j+1}}</td>
+                                <td>{{item_inlist.part_id}}</td>
+                                <td>{{item_inlist.part_name}}</td>
+                                <td>{{item_inlist.SUM}}</td>
+                                <td><button class="button is-info is-small" @click="getIndex(j)">
+                                        <span><b>เพิ่มเติม</b></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="box">
+                <div style="flex-basis:0;flex-grow:1;flex-shrink:1"></div>
+                <div class="title is-6">
+                    <i class="fas fa-list"></i> รายการอะไหล่ที่เหลือในคลังทั้งหมด
+                </div>
+                <table class="table is-narrow is-striped is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th> # </th>
+                            <th>รหัสประจำอะไหล่</th>
+                            <th>ชื่ออะไหล่</th>
+                            <th>จำนวน</th>
+
+                        </tr>
+                    </thead>
+                    <tbody v-for="(item_inlist,j) in part_inlist" :key="j" :value="j">
+                        <tr>
+                            <td>{{j+1}}</td>
+                            <td>{{item_inlist.part_id}}</td>
+                            <td>{{item_inlist.part_name}}</td>
+                            <td>{{item_inlist.part_quantity}}</td>
+                        </tr>
+                        <tr></tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--ดูรายละเอียวของรายการเบิก-->
+            <b-modal :active.sync="detail" :width="640" scroll="keep">
+                <div class="card">
+                    <header class="modal-card-head">
+                        <div class="title is-5">
+                            <div class="title is-5">
+                                <i class="fas fa-cogs"></i> รายละเอียดเพิ่มเติม
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="box">
+                        <table class="table is-narrow is-striped is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th> # </th>
+                                    <th>วันที่ทำการเบิก</th>
+                                    <th>จำนวน</th>
+                                </tr>
+                            </thead>
+
+                            <tbody v-for="(item_inlist,j) in part_detail" :key="j" :value="j">
+                                <tr>
+                                    <td>{{j+1}}</td>
+                                    <td>{{item_inlist.humandate}}</td>
+                                    <td>{{item_inlist.preq_quantity}}</td>
+                                </tr>
+                                <tr></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </b-modal>
+
+        </div>
+    </div>
+    <!-- --- อย่าแก้อะไรหลังจากนี้ --- -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+    <script defer>
+        // --- เขียน Vue ในนี้จ้า ---
+        new Vue({
+            el: "#app",
+            data: {
+                edit_quantityinlist: 0,
+                part_inlist: [],
+                part_inmonth: [],
+                part_detail: [],
+                detail: false,
+                index_num: "",
+            },
+            computed: {},
+            methods: {
+                /*get data to aip*/
+                get_task() {
+                    fetch("/api/partinmonth")
+                        .then(response => {
+                            if (response.ok) return response.json()
+                            throw { message: response.status + " " + response.statusText, response: response }
+                        })
+                        .then(data => {
+                            this.part_inlist = data.part
+                            this.part_inmonth = data.part_inmonth
+                        })
+                        .catch(error => {
+                            const loadingComponent = this.$buefy.loading.open()
+                            setTimeout(() => location.reload(), 3 * 1000)
+                            this.$buefy.snackbar.open({
+                                message: 'เกิดข้อผิดพลาด ' + '#' + error.message,
+                                type: 'is-warning',
+                                position: 'is-top',
+                                actionText: 'Retry',
+                                onAction: () => {
+                                    location.reload();
+                                }
+                            })
+                        });
+                },
+                getIndex: function (index) {
+                    this.index_num = index
+                    console.log("edit index" + this.editindex)
+                    this.get_detail_from_server()
+                    this.detail = true
+                },
+                get_detail_from_server() {
+                    fetch("/api/find_detail", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", },
+                        body: JSON.stringify({
+                            part_id: this.part_inlist[+this.index_num].part_id
+                        }),
+                    })
+                        .then(response => {
+                            if (response.ok) return response.json()
+                            throw { message: response.status + " " + response.statusText, response: response }
+                        })
+                        .then(data => {
+                            this.part_detail = data
+                            this.change_to_humandate()
+                        })
+                        .catch(error => {
+                            const loadingComponent = this.$buefy.loading.open()
+                            setTimeout(() => location.reload(), 3 * 1000)
+                            this.$buefy.snackbar.open({
+                                message: 'เกิดข้อผิดพลาด ' + '#' + error.message,
+                                type: 'is-warning',
+                                position: 'is-top',
+                                actionText: 'Retry',
+                                onAction: () => {
+                                    location.reload();
+                                }
+                            })
+                        })
+                },
+                change_to_humandate: function () {
+                    for (i = 0; i < this.part_detail.length; i++) {
+                        var todate = new Date(this.part_detail[i].preq_datetime).getDate();
+                        var tomonth = new Date(this.part_detail[i].preq_datetime).getMonth() + 1;
+                        var toyear = new Date(this.part_detail[i].preq_datetime).getFullYear();
+                        var original_date = todate + '/' + tomonth + '/' + toyear;
+                        this.part_detail[i].humandate = original_date
+                    }
+                }
+            },
+            created: function () {
+                this.get_task();
+            },
+        });
+    </script>
+</body>
+
+</html>

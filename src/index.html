@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com/" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,400;0,700;1,400;1,700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" />
+  <link rel="stylesheet" href="./css/master.css" />
+  <!-- --- เปลี่ยนชื่อหน้าใน Tag นี้ --- -->
+  <title>CPE231 - CMMS</title>
+</head>
+
+<body>
+  <div id="app">
+    <!-- --- เริ่มแก้ไขตั้งแต่ตรงนี้ --- -->
+
+
+    <div class="columns is-mobile is-vcentered" style="height:100vh;margin:0">
+      <div class="column is-7 is-hidden-mobile login-background"></div>
+      <div class="column is-5-tablet is-12-mobile content">
+        <div style="width:80%;margin:auto">
+          <form @submit.prevent="login">
+            <h1>เข้าสู่ระบบ</h1>
+            <hr />
+            <b-field label="รหัสพนักงาน" type="input">
+              <b-input v-model="emp_id" placeholder="ไม่ต้องกรอกอะไรครับแค่ทำไว้แล้วเสียดายเลยเอามาใส่"></b-input>
+            </b-field>
+            <b-field label="รหัสผ่าน">
+              <b-input type="password" placeholder="••••••••"></b-input>
+            </b-field>
+            <div class="spacer is-2x"></div>
+            <b-button type="is-primary" native-type="submit" @click="select()" expanded>เข้าสู่ระบบ
+
+            </b-button>
+            <div class="spacer"></div>
+            <div class="has-text-centered" style="font-size:.8">
+              <a href="/addpart.html" style="text-decoration:underline">ไม่สามารถเข้าสู่ระบบได้?</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- --- อย่าแก้อะไรหลังจากนี้ --- -->
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="./js/buefy.min.js"></script>
+  <style lang="scss" scoped>
+    .login-background {
+      height: 100vh;
+      background: url(../assets/background1.jpg);
+      background-position: center center;
+      background-size: cover;
+      box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1) inset,
+        0 0 0 1px rgba(10, 10, 10, 0.1) inset;
+      color: #fff;
+    }
+  </style>
+  <script defer>
+    // --- เขียน Vue ในนี้จ้า ---
+    new Vue({
+      el: "#app",
+      data: {},
+      computed: {},
+      methods: {
+        select: function () {
+          window.location.href="/addpart.html"
+        }
+      },
+    });
+  </script>
+
+
+
+
+
+</body>
+
+</html>

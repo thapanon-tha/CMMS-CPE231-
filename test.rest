@@ -1,0 +1,9 @@
+GET http://localhost:8000/api/
+
+###
+POST http://localhost:8000/api/tasks
+Content-Type: application/json
+
+{
+  "dep_name": "test"
+}

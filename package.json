@@ -1,0 +1,21 @@
+{
+  "name": "cpe231-cmms",
+  "version": "1.0.0",
+  "description": "CPE231 - Computerized Maintenance Management System (CMMS)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon --watch api --watch src index"
+  },
+  "author": "",
+  "license": "GNU GPL V3.0",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mariadb": "^2.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

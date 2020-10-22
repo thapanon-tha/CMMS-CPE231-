@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="preconnect" href="https://unpkg.com/" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css" />
+    <link rel="stylesheet" href="./css/master.css" />
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+    <!-- --- เปลี่ยนชื่อหน้าใน Tag นี้ --- -->
+    <title>CPE231 - CMMS - Stock</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- --- เริ่มแก้ไขตั้งแต่ตรงนี้ --- -->
+        <div class="box">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="container">
+                    <div class="navbar-item">
+                        <img src="../assets/logo.png" style="max-height:50px">
+                    </div>
+                    <div id="navbarBasicExample" class="navbar-menu">
+                        <div class="navbar-start">
+                            <b-navbar-item href="/">Index Page</b-navbar-item>
+                            <b-navbar-dropdown label="simple form">
+                                <b-navbar-item href="/addpart.html">
+                                    จัดการคลังอะไหล่
+                                </b-navbar-item>
+                            </b-navbar-dropdown>
+                            <b-navbar-dropdown label="complex form">
+                                <b-navbar-item href="/importpts.html">
+                                    ขอเบิกอะไหล่
+                                </b-navbar-item>
+                            </b-navbar-dropdown>
+                            <b-navbar-dropdown label="analyst report">
+                                <b-navbar-item href="/partinmonth.html">
+                                    สรุปการเบิกอะไหล่ในเดือนนี้
+                                </b-navbar-item>
+                            </b-navbar-dropdown>
+                        </div>
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <h1 class="header-text">Computerized Maintenance Management System</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <!--  เนื้อหาweb    -->
+        <div class="container">
+            <div class="spacer is-2x"></div>
+            <h1 class="title">
+                <i class="fas fa-cogs"></i> รายการอะไหล่ในคลังทั้งหมด
+            </h1>
+            <hr />
+            <div style="flex-basis:0;flex-grow:1;flex-shrink:1">
+                <div class="title is-6">
+                    <i class="fas fa-list"></i> รายการอะไหล่ที่เหลือในคลัง
+                </div>
+                <table class="table is-narrow is-striped is-fullwidth is-hoverable">
+                    <thead>
+                        <tr>
+                            <th> # </th>
+                            <th>รหัสประจำอะไหล่</th>
+                            <th>ชื่ออะไหล่</th>
+                            <th>ประเภท</th>
+                            <th>จำนวน</th>
+                            <th>การกระทำ</th>
+                        </tr>
+                    </thead>
+                    <tbody v-for="(item_inlist,j) in part_list" :key="j" :value="j">
+                        <tr>
+                            <td>{{j+1}}</td>
+                            <td>{{item_inlist.part_id}}</td>
+                            <td>{{item_inlist.part_name}}</td>
+                            <td>{{item_inlist.pcat_name}}</td>
+                            <td>{{item_inlist.part_quantity}}</td>
+                            <td>
+                                <!--edit button-->
+                                <b-button class="button is-warning is-small" @click="getIndex(j)">
+                                    <span class="icon">
+                                        <i class="fas fa-pen"></i>
+                                    </span>
+                                </b-button>
+                                <!--delete button-->
+                                <button class="button is-danger is-small" @click="getIndexForDelete(j)">
+                                    <span class="icon">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr></tr>
+                    </tbody>
+                    <tr>
+                        <td colspan="6" class="has-text-centered is-fullwidth">
+                            <button class="button is-fullwidth is-success" @click="input_part = true">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span>เพิ่มอะไหล่ใหม่</span>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!--แก้ไขจำนวนอะไหล่-->
+            <b-modal :active.sync="edit_quantity" :width="640" scroll="keep">
+                <div class="card">
+                    <header class="modal-card-head">
+                        <div class="title is-5">
+                            <div class="title is-5">
+                                <i class="fas fa-cogs">แก้ไขจำนวนอะไหล่</i>
+                            </div>
+                        </div>
+                    </header>
+                    <div class="card-content">
+                        <div class="field">
+                            <label class="label">จำนวน</label>
+                            <div class="control">
+                                <b-numberinput placeholder="จำนวน" v-model="new_quantity" :min=0></b-numberinput>
+                            </div>
+                        </div>
+                        <button class="button is-fullwidth is-success" @click="editQuantityInStore()">
+                            <span class="icon">
+                                <i class="fas fa-pen"></i>
+                            </span>
+                            <span>แก้ไข</span>
+                        </button>
+                    </div>
+                </div>
+            </b-modal>
+
+            <!-- เพิ่มอะไหล่ -->
+            <b-modal :active.sync="input_part" :width="640" scroll="keep">
+                <div class="card">
+                    <header class="modal-card-head">
+                        <div class="title is-5">
+                            <div class="title is-5">
+                                <i class="fas fa-cogs"></i> เพิ่มอะไหล่
+                            </div>
+                        </div>
+                    </header>
+                    <div class="card-content">
+                        <div class="field">
+                            <label class="label">ชื่ออะไหล่</label>
+                            <div class="control">
+                                <input class="input" type="text" placeholder="ชื่ออะไหล่" v-model="part_name" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">ประเภทของอะไหล่</label>
+                            <div class="control">
+                                <b-field>
+                                    <b-select class="is-fullwidth" placeholder="Select a task" v-model="pcat_index"
+                                        expanded>
+                                        <option v-for="(item,i) in part_cat" :key="i" :value="i">
+                                            {{item.pcat_name}}
+                                        </option>
+                                    </b-select>
+                                </b-field>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">จำนวน</label>
+                            <div class="control">
+                                <b-numberinput placeholder="จำนวน" v-model="part_quantity" :min=1></b-numberinput>
+                            </div>
+                        </div>
+
+                        <button class="button is-fullwidth is-success" @click="addNewPartToStore()">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>เพิ่มอะไหล่</span>
+                        </button>
+                    </div>
+                </div>
+            </b-modal>
+
+            <!--ยืนยันการลบ-->
+            <b-modal :active.sync="delete_fromstore" :width="525" scroll="keep">
+                <div class="card">
+                    <header class="modal-card-head">
+                        <div class="title is-5">
+                            <div class="title is-5">
+                                <i class="fas fa-cogs"> คุณต้องการนำอะไหล่นี้ออกจากรายการใช่หรือไม่</i>
+                            </div>
+                        </div>
+                    </header>
+                    <div class="card-content">
+                        <div class="field is-grouped" style="justify-content:center">
+                            <div class="control">
+                                <button class="button is-danger is-light"
+                                    @click="delete_fromstore=false">&emsp;ยกเลิก&emsp;</button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-success" @click="delete_store()">&emsp;ตกลง&emsp;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-modal>
+
+
+
+        </div>
+    </div>
+    <!-- --- อย่าแก้อะไรหลังจากนี้ --- -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+    <script defer>
+        // --- เขียน Vue ในนี้จ้า ---
+        new Vue({
+            el: "#app",
+            data: {
+                input_part: false,
+                addPart: false,
+                edit_quantity: false,
+                delete_fromstore: false,
+                index_num: "",
+                new_quantity: 0,
+                part_list: [
+                    { part_quatity: 0 }
+                ],
+                part_cat: [],
+                part: 0,
+                part_quantity: 0,
+                part_name: "",
+                pcat_index: 0,
+
+            },
+            computed: {},
+            methods: {
+                /*get data to aip*/
+                get_data() {
+                    fetch("/api/addnewpart")
+                        .then(response => {
+                            if (response.ok) return response.json()
+                            throw { message: response.status + " " + response.statusText, response: response }
+                        })
+                        .then(data => {
+                            this.part_list = data.part
+                            this.part_cat = data.pcat
+                        })
+                        .catch(error => {
+                            const loadingComponent = this.$buefy.loading.open()
+                            setTimeout(() => location.reload(), 3 * 1000)
+                            this.$buefy.snackbar.open({
+                                message: 'เกิดข้อผิดพลาด ' + '#' + error.message,
+                                type: 'is-warning',
+                                position: 'is-top',
+                                actionText: 'Retry',
+                                onAction: () => {
+                                    location.reload();
+                                }
+                            })
+                        });
+                },
+                delete_store() {
+                    fetch("/api/delete_part", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", },
+                        body: JSON.stringify({
+                            part_id: this.part_list[this.index_num].part_id
+                        }),
+                    }).then(response => {
+                        if (response.ok) {
+                            const loadingComponent = this.$buefy.loading.open()
+                            setTimeout(() => location.reload(), 3 * 1000)
+                            this.$buefy.snackbar.open({
+                                message: 'ลบข้อมูลสำเร็จ',
+                                position: 'is-top',
+                                actionText: 'OK',
+                                onAction: () => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
+                },
+                /*sent data to aip*/
+                addNewPartToStore() {
+                    obj = this.part_list.find(el => el.part_name === this.part_name)
+                    if (this.part_quantity <= 0 || this.part_name === "") {
+                        this.$buefy.snackbar.open({
+                            message: 'กรุณาหรอกข้อมูลให้ถูกต้อง',
+                            position: 'is-top',
+                            type: 'is-warning',
+                            actionText: 'Retry',
+                        })
+                    }
+                    else if (obj && obj.part_name === this.part_name && this.part_cat[this.pcat_index].pcat_id == obj.part_category) {
+                        this.$buefy.snackbar.open({
+                            message: 'มีอะไหล่ชื่อนี้ในระบบแล้ว',
+                            position: 'is-top',
+                            type: 'is-warning',
+                            actionText: 'Retry',
+                        })
+                        this.part_name = ''
+                    }
+                    else {
+                        fetch("/api/addnewpart", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", },
+                            body: JSON.stringify({
+                                part_quantity: this.part_quantity,
+                                part_name: this.part_name,
+                                pcat_id: this.part_cat[this.pcat_index].pcat_id
+                            }),
+                        }).then(response => {
+                            if (response.ok) {
+                                const loadingComponent = this.$buefy.loading.open()
+                                setTimeout(() => location.reload(), 3 * 1000)
+                                this.$buefy.snackbar.open({
+                                    message: 'เพิ่มข้อมูลสำเร็จ',
+                                    position: 'is-top',
+                                    actionText: 'OK',
+                                    onAction: () => {
+                                        location.reload();
+                                    }
+                                })
+                            }
+                        })
+                    }
+                },
+                /*sent data to aip for edit quantity in store*/
+                editQuantityInStore() {
+                    if (this.new_quantity < 0) {
+                        this.$buefy.snackbar.open({
+                            message: 'กรุณากรอกจำนวนอะไหล่ให้ถูกต้อง',
+                            type: 'is-warning',
+                            position: 'is-top',
+                            actionText: 'Retry',
+                        })
+                        this.new_quantity = 0
+                    }
+                    else {
+                        fetch("/api/edit_quantity_in_store", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", },
+                            body: JSON.stringify({
+                                part_quantity: this.new_quantity,
+                                part_id: this.part_list[+this.index_num].part_id
+                            }),
+                        }).then(response => {
+                            if (response.ok) {
+                                const loadingComponent = this.$buefy.loading.open()
+                                setTimeout(() => location.reload(), 3 * 1000)
+                                this.$buefy.snackbar.open({
+                                    message: 'แก้ไขข้อมูลสำเร็จ',
+                                    position: 'is-top',
+                                    actionText: 'OK',
+                                    onAction: () => {
+                                        location.reload();
+                                    }
+                                })
+                            }
+                        })
+                    }
+                },
+                /*get index for edit quantity in list*/
+                getIndex: function (index) {
+                    this.index_num = index
+                    console.log("edit index" + this.index_num)
+                    this.edit_quantity = true
+                },
+                getIndexForDelete: function (index) {
+                    this.index_num = index
+                    console.log("edit index" + this.editindex)
+                    this.delete_fromstore = true
+                },
+            },
+            created: function () {
+                this.get_data();
+            },
+        }
+        );
+    </script>
+
+
+
+</body>
+
+</html>
